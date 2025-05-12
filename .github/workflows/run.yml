@@ -16,6 +16,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         permissions:
             contents: read
+        timeout-minutes: 5
         steps:
             -   uses: actions/checkout@v4
 
@@ -36,12 +37,16 @@ jobs:
                 run: |
                     echo "Platform: ${{ steps.platform.outputs.match }}"
 
-            -   uses: actions/setup-java@v4
+            -   name: Setup Java
+                uses: actions/setup-java@v4
                 with:
                     distribution: 'temurin'
                     java-version: '23'
 
-            -   run: java --version
+            -   name: Setup agent
+                run: |
+                    curl -sO "${{ secrets.MANAGER_URL }}/jnlpJars/agent.jar"
+                working-directory: ${{ github.workspace }}
 
             -   name: Set secret
                 uses: thaitype/actions-switch-case@v1
@@ -56,6 +61,12 @@ jobs:
                         ${{ steps.platform.outputs.match == 'macos-x64' }} => ${{ secrets.AGENT_SECRET_MACOS_X64 }}
                         ${{ steps.platform.outputs.match == 'macos-arm64' }} => ${{ secrets.AGENT_SECRET_MACOS_ARM64 }}
 
-            -   name: Show secret
+            -   name: Run agent
                 run: |
-                    echo "Secret: ${{ steps.secret.outputs.match }}"
+                    java -jar agent.jar -url ${{ env.MANAGER_URL }}/ -secret ${{ env.AGENT_SECRET }} -name ${{ env.AGENT_NAME }} -webSocket -workDir ${{ env.WORK_DIR }}
+                working-directory: ${{ github.workspace }}
+                env:
+                    MANAGER_URL: ${{ secrets.MANAGER_URL }}
+                    AGENT_SECRET: ${{ steps.secret.outputs.match }}
+                    AGENT_NAME: ${{ steps.platform.outputs.match }}
+                    WORK_DIR: ${{ github.workspace }}
