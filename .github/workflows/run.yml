@@ -18,8 +18,27 @@ jobs:
             contents: read
         steps:
             -   uses: actions/checkout@v4
+
+            -   name: Detect platform
+                uses: thaitype/actions-switch-case@v1
+                id: platform
+                with:
+                    default: "unknown"
+                    conditionals-with-values: |
+                        ${{ matrix.os == 'ubuntu-24.04' }} => ubuntu-x64
+                        ${{ matrix.os == 'ubuntu-24.04-arm' }} => ubuntu-arm64
+                        ${{ matrix.os == 'windows-2025' }} => windows-x64
+                        ${{ matrix.os == 'windows-11-arm' }} => windows-arm64
+                        ${{ matrix.os == 'macos-13' }} => macos-x64
+                        ${{ matrix.os == 'macos-15' }} => macos-arm64
+
+            -   name: Show platform
+                run: |
+                    echo "Platform: ${{ steps.platform.outputs.match }}"
+
             -   uses: actions/setup-java@v4
                 with:
                     distribution: 'temurin'
                     java-version: '23'
+
             -   run: java --version
