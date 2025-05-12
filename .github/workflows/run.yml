@@ -27,11 +27,11 @@ jobs:
                 with:
                     default: "unknown"
                     conditionals-with-values: |
-                        ${{ matrix.os == 'ubuntu-24.04' }} => ubuntu-x64
-                        ${{ matrix.os == 'ubuntu-24.04-arm' }} => ubuntu-arm64
-                        ${{ matrix.os == 'windows-2025' }} => windows-x64
+                        ${{ matrix.os == 'ubuntu-24.04' }} => linux-x64
+                        ${{ matrix.os == 'ubuntu-24.04-arm' }} => linux-arm64
                         ${{ matrix.os == 'macos-13' }} => macos-x64
                         ${{ matrix.os == 'macos-15' }} => macos-arm64
+                        ${{ matrix.os == 'windows-2025' }} => windows-x64
 
             -   name: Show platform
                 run: |
@@ -54,11 +54,11 @@ jobs:
                 with:
                     default: "unknown"
                     conditionals-with-values: |
-                        ${{ steps.platform.outputs.match == 'ubuntu-x64' }} => ${{ secrets.AGENT_SECRET_UBUNTU_X64 }}
-                        ${{ steps.platform.outputs.match == 'ubuntu-arm64' }} => ${{ secrets.AGENT_SECRET_UBUNTU_ARM64 }}
-                        ${{ steps.platform.outputs.match == 'windows-x64' }} => ${{ secrets.AGENT_SECRET_WINDOWS_X64 }}
+                        ${{ steps.platform.outputs.match == 'linux-x64' }} => ${{ secrets.AGENT_SECRET_LINUX_X64 }}
+                        ${{ steps.platform.outputs.match == 'linux-arm64' }} => ${{ secrets.AGENT_SECRET_LINUX_ARM64 }}
                         ${{ steps.platform.outputs.match == 'macos-x64' }} => ${{ secrets.AGENT_SECRET_MACOS_X64 }}
                         ${{ steps.platform.outputs.match == 'macos-arm64' }} => ${{ secrets.AGENT_SECRET_MACOS_ARM64 }}
+                        ${{ steps.platform.outputs.match == 'windows-x64' }} => ${{ secrets.AGENT_SECRET_WINDOWS_X64 }}
 
             -   name: Run agent
                 run: |
