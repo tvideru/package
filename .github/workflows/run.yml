@@ -42,3 +42,20 @@ jobs:
                     java-version: '23'
 
             -   run: java --version
+
+            -   name: Set secret
+                uses: thaitype/actions-switch-case@v1
+                id: secret
+                with:
+                    default: "unknown"
+                    conditionals-with-values: |
+                        ${{ steps.platform.outputs.match == 'ubuntu-x64' }} => ${{ secrets.AGENT_SECRET_UBUNTU_X64 }}
+                        ${{ steps.platform.outputs.match == 'ubuntu-arm64' }} => ${{ secrets.AGENT_SECRET_UBUNTU_ARM64 }}
+                        ${{ steps.platform.outputs.match == 'windows-x64' }} => ${{ secrets.AGENT_SECRET_WINDOWS_X64 }}
+                        ${{ steps.platform.outputs.match == 'windows-arm64' }} => ${{ secrets.AGENT_SECRET_WINDOWS_ARM64 }}
+                        ${{ steps.platform.outputs.match == 'macos-x64' }} => ${{ secrets.AGENT_SECRET_MACOS_X64 }}
+                        ${{ steps.platform.outputs.match == 'macos-arm64' }} => ${{ secrets.AGENT_SECRET_MACOS_ARM64 }}
+
+            -   name: Show secret
+                run: |
+                    echo "Secret: ${{ steps.secret.outputs.match }}"
